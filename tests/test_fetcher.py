@@ -1,32 +1,99 @@
-from fetcher import fetch_manga_info, MangaInfo
+import requests
+from bs4 import BeautifulSoup
 
-TEST_COMIC_ID = "30252"
+from fetcher import (
+    manga_fetch,
+    MangaInfo,
+    fetch_base_info,
+    fetch_chapter_list,
+    analyze_chapter,
+    make_img_list,
+)
 
-def test_fetch_manga_info_basic():
-    manga_info: MangaInfo = fetch_manga_info(TEST_COMIC_ID)
 
-    # 检查对象类型
-    assert isinstance(manga_info, MangaInfo)
+class FakeResponse:
+    def __init__(self, text: str, status_code: int = 200):
+        self.text = text
+        self.status_code = status_code
 
-    # 检查 title, cover, author 字段
-    assert manga_info.title is not None
-    assert isinstance(manga_info.title, str)
-    assert manga_info.cover is None or isinstance(manga_info.cover, str)
-    assert manga_info.author is None or isinstance(manga_info.author, str)
+    def raise_for_status(self):
+        if self.status_code >= 400:
+            raise requests.HTTPError(f"status {self.status_code}")
 
-    # 检查 chapters 是字典，且嵌套字典正确:
-    # {'单行本': {'第一卷': 'URL','第二卷': 'URL', ...}, '单话': {'第一话': 'URL'}, ...}
-    assert isinstance(manga_info.chapters, dict)
-    for group_name, chapters in manga_info.chapters.items():
-        assert isinstance(group_name, str)
-        assert isinstance(chapters, dict)
-        for chapter_title, chapter_url in chapters.items():
-            assert isinstance(chapter_title, str)
-            assert isinstance(chapter_url, str)
 
-def test_chapters_non_empty():
-    # 检查 chapters 至少包含一组章节
-    manga_info: MangaInfo = fetch_manga_info(TEST_COMIC_ID)
-    assert len(manga_info.chapters) > 0
-    for group_name, chapters in manga_info.chapters.items():
-        assert len(chapters) > 0
+def test_fetch_base_info_and_chapter_list():
+    # Build a minimal HTML page matching selectors used in fetcher
+    html = '''
+    <html>
+      <body>
+        <h1>测试漫</h1>
+        <div class="book-cover"><p><img src="//cover.example/img.jpg"/></p></div>
+        <ul class="detail-list cf">
+          <li></li>
+          <li><span></span><span><a href="/author/1">作者名</a></span></li>
+        </ul>
+        <h4><span>单话</span></h4>
+        <div class="chapter-list">
+          <ul>
+            <li><span>第一话</span><a href="/comic/123/1001.html">link</a></li>
+            <li><span>第二话</span><a href="/comic/123/1002.html">link</a></li>
+          </ul>
+        </div>
+      </body>
+    </html>
+    '''
+
+    soup = BeautifulSoup(html, "html.parser")
+    title, cover, author = fetch_base_info(soup)
+    assert title == "测试漫"
+    assert cover == "https://cover.example/img.jpg"
+    assert author == "作者名"
+
+    chapter_groups = fetch_chapter_list(soup)
+    assert isinstance(chapter_groups, dict)
+    assert "单话" in chapter_groups
+    chapters = chapter_groups["单话"]
+    # reversed order in implementation, so expect keys
+    assert list(chapters.keys()) == ["第二话", "第一话"]
+
+
+def test_manga_fetch_handles_http_error(monkeypatch):
+    # Simulate network error
+    def fake_get(*args, **kwargs):
+        raise requests.RequestException("network")
+
+    monkeypatch.setattr("requests.get", fake_get)
+    info = manga_fetch("no-such-cid")
+    assert isinstance(info, MangaInfo)
+    assert info.title == ""
+
+
+def test_analyze_chapter_uses_unpack(monkeypatch):
+    # page with a script containing the special eval pattern
+    script_html = '<script>some();["\\x65\\x76\\x61\\x6c"]</script>'
+    page_html = f"<html><body>{script_html}</body></html>"
+
+    def fake_get(url, headers=None):
+        return FakeResponse(page_html)
+
+    monkeypatch.setattr("requests.get", fake_get)
+
+    # patch unpack to return a dict we control
+    monkeypatch.setattr("fetcher.unpack", lambda s: {"files": ["a.jpg"], "sl": {"e0": 1, "e1": 2}, "path": "/p/"})
+
+    result = analyze_chapter("http://example/chapter.html")
+    assert isinstance(result, dict)
+    assert result["files"] == ["a.jpg"]
+
+
+def test_make_img_list_builds_urls():
+    chapter_data = {
+        "files": ["1.jpg", "2.jpg"],
+        "path": "/path/to/",
+        "sl": {"e0": 111, "e1": 222},
+    }
+    result = make_img_list(chapter_data)
+    assert len(result) == 2
+    for file_name, url in zip(chapter_data["files"], result):
+        assert file_name in url
+        assert str(chapter_data["sl"]["e0"]) in url
