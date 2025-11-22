@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from typing import Dict, List
 import requests
 from bs4 import BeautifulSoup
 
@@ -10,7 +9,7 @@ class MangaInfo:
     title: str
     cover: str | None = None
     author: str | None = None
-    chapters: Dict[str, Dict[str, str]] = field(default_factory=dict)
+    chapters: dict[str, dict[str, str]] = field(default_factory=dict)
 
 def fetch_manga_info(cid: str) -> MangaInfo:
     url = API_URL.format(comic_id=cid)
@@ -42,17 +41,17 @@ def fetch_base_info(soup) -> tuple[str|None, str|None, str|None]:
 
     return title, cover, author
 
-def fetch_chapter_list(soup) -> Dict[str, List[str]]:
-    chapter_groups: Dict[str, Dict[str, str]] = {}
+def fetch_chapter_list(soup) -> dict[str, dict[str, str]]:
+    chapter_groups: dict[str, dict[str, str]] = {}
 
     type_list = [span.get_text(strip=True) for span in soup.select("h4 > span")]
 
-    list_groups = soup.select("div#chapter-list-1")
+    list_groups = soup.select("div.chapter-list")
     for idx, group in enumerate(list_groups):
         chapter_parts = group.select("ul")
-        content_list: Dict[str, str ] = {}
+        content_list: dict[str, str] = {}
         for part in chapter_parts:
-            tmp: Dict[str, str ] = {}
+            tmp: dict[str, str] = {}
             for li in part.select("li"):
                 chapter_title = li.find("span").find(string=True, recursive=False)
                 chapter_url = li.find("a")["href"]
