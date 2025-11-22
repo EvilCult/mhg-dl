@@ -20,7 +20,7 @@ def fetch_manga_info(cid: str) -> MangaInfo:
         resp.raise_for_status()
     except Exception :
         print("漫画id错误 或 漫画不存在.")
-        return MangaInfo(title="", cover=None, author=None, chapters={})
+        return MangaInfo(cid=cid, title="", cover=None, author=None, chapters={})
 
     soup = BeautifulSoup(resp.text, "html.parser")
 

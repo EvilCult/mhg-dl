@@ -1,6 +1,24 @@
 import argparse
 import fetcher
 
+def select_chapter(chapters: dict[str, dict[str, str]], typ: str, skip: str) -> dict[str, dict[str, str]]:
+    dl_chapters: dict[str, str] = chapters
+
+    if typ != "all":
+        dl_chapters = chapters[typ]
+
+        if skip is not None:
+            skiping: bool = True
+            tmp: dict[str, str] = {}
+            for key, value in dl_chapters.items():
+                if key == skip:
+                    skiping = False
+                if not skiping:
+                    tmp[key] = value
+            dl_chapters = tmp
+
+    return  {typ: dl_chapters}
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="mhg-dl, 一个简单的漫画下载工具")
 
@@ -19,23 +37,6 @@ def main() -> None:
 
     print(data)
 
-def select_chapter(chapters: dict[str, dict[str, str]], typ: str, skip: str) -> dict[str, dict[str, str]]:
-    dl_chapters: dict[str, str] = chapters
-
-    if typ != "all":
-        dl_chapters = chapters[typ]
-
-        if skip is not None:
-            skiping: bool = True
-            tmp: dict[str, str] = {}
-            for key, value in dl_chapters.items():
-                if key == skip:
-                    skiping = False
-                if not skiping:
-                    tmp[key] = value
-            dl_chapters = tmp
-
-    return  {typ: dl_chapters}
 
 if __name__ == "__main__":
     main()
