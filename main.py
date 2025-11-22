@@ -1,5 +1,6 @@
 import argparse
-import fetcher
+from fetcher import manga_fetch, chapter_fetch
+# from downloader import manga_download
 
 def select_chapter(chapters: dict[str, dict[str, str]], typ: str, skip: str) -> dict[str, dict[str, str]]:
     dl_chapters: dict[str, str] = chapters
@@ -24,18 +25,19 @@ def main() -> None:
 
     parser.add_argument("--cid", "-c", type=int, default=1, help="漫画cid, 如 https://www.manhuagui.com/comic/**cid**/")
     parser.add_argument("--type", "-t", type=str, default="all", help="下载内容的类型, 如: 单行本, 单话等")
-    parser.add_argument("--skip", "-s", type=str, default=None, help="跳过之前内容, 从指定章节开始下载, 章节名称需与目录一致")
+    parser.add_argument("--skip", "-s", type=str, default=None, help="跳过之前内容, 从指定章节开始下载, 章节名称需与目录显示一致")
 
     args = parser.parse_args()
 
-    data = fetcher.fetch_manga_info(str(args.cid))
+    manga = manga_fetch(str(args.cid))
 
-    if data.title == "":
+    if manga.title == "":
         return None
 
-    data.chapters = select_chapter(data.chapters, args.type, args.skip)
+    manga.chapters = select_chapter(manga.chapters, args.type, args.skip)
 
-    print(data)
+    manga = chapter_fetch(manga)
+    print(manga)
 
 
 if __name__ == "__main__":
