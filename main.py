@@ -1,7 +1,7 @@
 import argparse
 import fetcher
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="mhg-dl, 一个简单的漫画下载工具")
 
     parser.add_argument("--cid", "-c", type=int, default=1, help="漫画cid, 如 https://www.manhuagui.com/comic/**cid**/")
@@ -12,22 +12,30 @@ def main():
 
     data = fetcher.fetch_manga_info(str(args.cid))
 
-    if args.type != "all":
-        dl_chapters: dict[str, str] = data.chapters[args.type]
+    if data.title == "":
+        return None
 
-        if args.skip is not None:
+    data.chapters = select_chapter(data.chapters, args.type, args.skip)
+
+    print(data)
+
+def select_chapter(chapters: dict[str, dict[str, str]], typ: str, skip: str) -> dict[str, dict[str, str]]:
+    dl_chapters: dict[str, str] = chapters
+
+    if typ != "all":
+        dl_chapters = chapters[typ]
+
+        if skip is not None:
             skiping: bool = True
             tmp: dict[str, str] = {}
             for key, value in dl_chapters.items():
-                if key == args.skip:
+                if key == skip:
                     skiping = False
                 if not skiping:
                     tmp[key] = value
             dl_chapters = tmp
 
-        data.chapters = {args.type: dl_chapters}
-
-    print(data)
+    return  {typ: dl_chapters}
 
 if __name__ == "__main__":
     main()

@@ -6,6 +6,7 @@ API_URL = "https://www.manhuagui.com/comic/{comic_id}/"
 
 @dataclass
 class MangaInfo:
+    cid: str
     title: str
     cover: str | None = None
     author: str | None = None
@@ -14,8 +15,12 @@ class MangaInfo:
 def fetch_manga_info(cid: str) -> MangaInfo:
     url = API_URL.format(comic_id=cid)
 
-    resp = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
-    resp.raise_for_status()
+    try:
+        resp = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
+        resp.raise_for_status()
+    except Exception :
+        print("漫画id错误 或 漫画不存在.")
+        return MangaInfo(title="", cover=None, author=None, chapters={})
 
     soup = BeautifulSoup(resp.text, "html.parser")
 
@@ -24,10 +29,11 @@ def fetch_manga_info(cid: str) -> MangaInfo:
     chapter_groups = fetch_chapter_list(soup)
 
     return MangaInfo(
-        title=title,
-        cover=cover,
-        author=author,
-        chapters=chapter_groups
+        cid = cid,
+        title = title,
+        cover = cover,
+        author = author,
+        chapters = chapter_groups
     )
 
 def fetch_base_info(soup) -> tuple[str|None, str|None, str|None]:
@@ -55,7 +61,7 @@ def fetch_chapter_list(soup) -> dict[str, dict[str, str]]:
             for li in part.select("li"):
                 chapter_title = li.find("span").find(string=True, recursive=False)
                 chapter_url = li.find("a")["href"]
-                tmp[chapter_title] = chapter_url
+                tmp[chapter_title] = chapter_url.split("/")[3].replace(".html", "")
             content_list.update(dict(reversed(list(tmp.items()))))
         chapter_groups[type_list[idx]] = content_list
 
