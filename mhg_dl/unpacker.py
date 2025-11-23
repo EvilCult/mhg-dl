@@ -32,9 +32,10 @@ def unpack_packed(p, a, c, k) -> str:
 
     d = {}
     for i in range(c):
-        d[e(i)] = k[i] if i < len(k) else e(i)
+        val = (k[i] if i < len(k) else None) or e(i)
+        d[e(i)] = val
 
-    pattern = re.compile(r'\b(\w+)\b')
+    pattern = re.compile(r"\b(\w+)\b")
     def replace(match):
         word = match.group(1)
         return d.get(word, word)

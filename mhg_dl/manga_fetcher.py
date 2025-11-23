@@ -115,19 +115,13 @@ def analyze_chapter(chapter_url: str) -> dict[str, any]:
     return chapter_data
 
 def make_img_list(chapter_data: dict[str, any]) -> list[str]:
-    # 不知道为什么要重复第一个字母,先hot fix一下
-    def hot_fix_path(path: str) -> str:
-        parts = path.split('/')
-        parts[2] = f"{parts[2][0]}/{parts[2]}"
-        return '/'.join(parts)
-    
     dl_list: list[str] = []
     if "sl" not in chapter_data or "files" not in chapter_data:
         return dl_list
     
     for file_name in chapter_data["files"]:
-        path: str = hot_fix_path(chapter_data["path"])
-        image_url = IMAGE_URL.format(path=quote(path), file_name=file_name, e0=chapter_data["sl"]["e0"], e1=chapter_data["sl"]["e1"])
+        path: str = chapter_data["path"]
+        image_url = IMAGE_URL.format(path=quote(path), file_name=file_name, e0=chapter_data["sl"]["e"], e1=chapter_data["sl"]["m"])
         dl_list.append(image_url)
 
     return dl_list
