@@ -1,8 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import quote
-import time
-import random
+# import time
+# import random
 from unpacker import unpack
 from models import MangaInfo
 from config import FAKE_HEADERS, MANGA_URL, CHAPTER_URL, IMAGE_URL
@@ -15,7 +15,7 @@ def manga_fetch(cid: str, fetch_filters: tuple[str, str]) -> MangaInfo:
         resp = requests.get(url, headers=FAKE_HEADERS)
         resp.raise_for_status()
     except Exception :
-        print("漫画id错误 或 漫画不存在.")
+        print("The comic id is wrong or the comic does not exist.")
         return MangaInfo(cid=cid, title="", cover=None, author=None, chapters={})
 
     soup = BeautifulSoup(resp.text, "html.parser")
@@ -84,16 +84,15 @@ def select_chapter(chapters: dict[str, dict[str, str]], typ: str, skip: str) -> 
 
 def chapter_fetch(manga: MangaInfo) -> MangaInfo:
     for typ, chapters in manga.chapters.items():
-        print(f"下载类型: {typ}")
+        print(f"Analyzing: {typ}")
         for chapter_name, chapter_id in chapters.items():
             chapter_url: str = CHAPTER_URL.format(comic_id=manga.cid, chapter_id=chapter_id)
             
-            # Random sleep 防止封禁, 暂时没想好显示不显示
-            seconds = random.uniform(1, 5) 
-            # print(f"随机睡眠{seconds:.2f}秒以防封禁...")
-            time.sleep(seconds)
+            # Random sleep 防止封禁
+            # seconds = random.uniform(0, 2) 
+            # time.sleep(seconds)
 
-            print(f"开始分析: {chapter_name} ({chapter_url})")
+            print(f"Analyzing: {chapter_name} ({chapter_url})")
             images_data = analyze_chapter(chapter_url)
             chapters[chapter_name] = make_img_list(images_data)
     return manga
@@ -104,7 +103,7 @@ def analyze_chapter(chapter_url: str) -> dict[str, any]:
         resp = requests.get(chapter_url, headers=FAKE_HEADERS)
         resp.raise_for_status()
     except Exception:
-        print(f"无法访问页面: {chapter_url}")
+        print(f"Unable to access: {chapter_url}")
         return chapter_data
 
     soup = BeautifulSoup(resp.text, "html.parser")
