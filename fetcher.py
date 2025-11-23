@@ -1,25 +1,18 @@
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import quote
-from dataclasses import dataclass, field
 import time
 import random
 from unpacker import unpack
+from models import MangaInfo
 
 MANGA_URL = "https://www.manhuagui.com/comic/{comic_id}/"
 CHAPTER_URL = "https://www.manhuagui.com/comic/{comic_id}/{chapter_id}.html"
 IMAGE_URL = "https://us2.hamreus.com{path}{file_name}?e={e0}&m={e1}"
 
-@dataclass
-class MangaInfo:
-    cid: str
-    title: str
-    cover: str | None = None
-    author: str | None = None
-    chapters: dict[str, dict[str, str | list[str]]] = field(default_factory=dict)
-
-def manga_fetch(cid: str) -> MangaInfo:
+def manga_fetch(cid: str, fetch_filters: tuple[str, str]) -> MangaInfo:
     url = MANGA_URL.format(comic_id=cid)
+    typ, skip = tuple(fetch_filters)
 
     try:
         resp = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
@@ -33,6 +26,7 @@ def manga_fetch(cid: str) -> MangaInfo:
     title, cover, author = fetch_base_info(soup)
     
     chapter_groups = fetch_chapter_list(soup)
+    chapter_groups = select_chapter(chapter_groups, typ, skip)
 
     return MangaInfo(
         cid = cid,
@@ -73,14 +67,33 @@ def fetch_chapter_list(soup) -> dict[str, dict[str, str]]:
 
     return chapter_groups
 
+def select_chapter(chapters: dict[str, dict[str, str]], typ: str, skip: str) -> dict[str, dict[str, str]]:
+    dl_chapters: dict[str, str] = chapters
+
+    if typ != "all":
+        dl_chapters = chapters[typ]
+
+        if skip is not None:
+            skiping: bool = True
+            tmp: dict[str, str] = {}
+            for key, value in dl_chapters.items():
+                if key == skip:
+                    skiping = False
+                if not skiping:
+                    tmp[key] = value
+            dl_chapters = tmp
+
+    return  {typ: dl_chapters}
+
 def chapter_fetch(manga: MangaInfo) -> MangaInfo:
     for typ, chapters in manga.chapters.items():
         print(f"下载类型: {typ}")
         for chapter_name, chapter_id in chapters.items():
             chapter_url: str = CHAPTER_URL.format(comic_id=manga.cid, chapter_id=chapter_id)
             
+            # Random sleep 防止封禁, 暂时没想好显示不显示
             seconds = random.uniform(1, 5) 
-            print(f"随机睡眠{seconds:.2f}秒以防封禁...")
+            # print(f"随机睡眠{seconds:.2f}秒以防封禁...")
             time.sleep(seconds)
 
             print(f"开始分析: {chapter_name} ({chapter_url})")
