@@ -5,17 +5,14 @@ import time
 import random
 from unpacker import unpack
 from models import MangaInfo
-
-MANGA_URL = "https://www.manhuagui.com/comic/{comic_id}/"
-CHAPTER_URL = "https://www.manhuagui.com/comic/{comic_id}/{chapter_id}.html"
-IMAGE_URL = "https://us2.hamreus.com{path}{file_name}?e={e0}&m={e1}"
+from config import FAKE_HEADERS, MANGA_URL, CHAPTER_URL, IMAGE_URL
 
 def manga_fetch(cid: str, fetch_filters: tuple[str, str]) -> MangaInfo:
     url = MANGA_URL.format(comic_id=cid)
     typ, skip = tuple(fetch_filters)
 
     try:
-        resp = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
+        resp = requests.get(url, headers=FAKE_HEADERS)
         resp.raise_for_status()
     except Exception :
         print("漫画id错误 或 漫画不存在.")
@@ -104,7 +101,7 @@ def chapter_fetch(manga: MangaInfo) -> MangaInfo:
 def analyze_chapter(chapter_url: str) -> dict[str, any]:
     chapter_data: dict[str, any] = {}
     try:
-        resp = requests.get(chapter_url, headers={"User-Agent": "Mozilla/5.0"})
+        resp = requests.get(chapter_url, headers=FAKE_HEADERS)
         resp.raise_for_status()
     except Exception:
         print(f"无法访问页面: {chapter_url}")
@@ -119,12 +116,19 @@ def analyze_chapter(chapter_url: str) -> dict[str, any]:
     return chapter_data
 
 def make_img_list(chapter_data: dict[str, any]) -> list[str]:
+    # 不知道为什么要重复第一个字母,先hot fix一下
+    def hot_fix_path(path: str) -> str:
+        parts = path.split('/')
+        parts[2] = f"{parts[2][0]}/{parts[2]}"
+        return '/'.join(parts)
+    
     dl_list: list[str] = []
     if "sl" not in chapter_data or "files" not in chapter_data:
         return dl_list
     
     for file_name in chapter_data["files"]:
-        image_url = IMAGE_URL.format(path=quote(chapter_data["path"]), file_name=file_name, e0=chapter_data["sl"]["e0"], e1=chapter_data["sl"]["e1"])
+        path: str = hot_fix_path(chapter_data["path"])
+        image_url = IMAGE_URL.format(path=quote(path), file_name=file_name, e0=chapter_data["sl"]["e0"], e1=chapter_data["sl"]["e1"])
         dl_list.append(image_url)
 
     return dl_list

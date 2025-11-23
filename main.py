@@ -1,8 +1,7 @@
 import argparse
 from models import MangaInfo
 from fetcher import manga_fetch, chapter_fetch
-# from downloader import manga_download
-
+from downloader import manga_download
 
 def download_command(args) -> None:
     fetch_filters: tuple[str, str] = (args.type, args.skip)
@@ -12,7 +11,7 @@ def download_command(args) -> None:
         return
 
     manga = chapter_fetch(manga)
-    print(manga)
+    manga_download(manga)
 
 def search_command(args) -> None:
     pass
