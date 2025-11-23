@@ -1,6 +1,6 @@
 from mhg_dl.models import MangaInfo
-from mhg_dl.fetcher import manga_fetch, chapter_fetch
-from mhg_dl.downloader import manga_download
+from mhg_dl.manga_fetcher import manga_fetch, chapter_fetch
+from mhg_dl.manga_downloader import manga_download
 
 def download_command(args) -> None:
     fetch_filters: tuple[str, str] = (args.type, args.skip)
@@ -10,7 +10,7 @@ def download_command(args) -> None:
         return
 
     manga = chapter_fetch(manga)
-    # manga_download(manga)
+    manga_download(manga)
 
 def search_command(args) -> None:
     pass

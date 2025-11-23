@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 
-from mhg_dl.fetcher import (
+from mhg_dl.manga_fetcher import (
     manga_fetch,
     MangaInfo,
     fetch_base_info,
@@ -79,7 +79,7 @@ def test_analyze_chapter_uses_unpack(monkeypatch):
     monkeypatch.setattr("requests.get", fake_get)
 
     # patch unpack to return a dict we control
-    monkeypatch.setattr("mhg_dl.fetcher.unpack", lambda s: {"files": ["a.jpg"], "sl": {"e0": 1, "e1": 2}, "path": "/p/"})
+    monkeypatch.setattr("mhg_dl.manga_fetcher.unpack", lambda s: {"files": ["a.jpg"], "sl": {"e0": 1, "e1": 2}, "path": "/p/"})
 
     result = analyze_chapter("http://example/chapter.html")
     assert isinstance(result, dict)

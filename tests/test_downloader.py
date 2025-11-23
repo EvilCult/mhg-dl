@@ -1,7 +1,7 @@
 import os
 import pytest
 from unittest import mock
-from mhg_dl.downloader import manga_download, download_image
+from mhg_dl.manga_downloader import manga_download, download_image
 from mhg_dl.models import MangaInfo
 
 # 临时目录 fixture
@@ -21,7 +21,7 @@ def fake_image_content():
 # mock requests.get
 @pytest.fixture
 def mock_requests_get(fake_image_content):
-    with mock.patch("mhg_dl.downloader.requests.get") as mocked_get:
+    with mock.patch("mhg_dl.manga_downloader.requests.get") as mocked_get:
         mocked_resp = mock.Mock()
         mocked_resp.content = fake_image_content
         mocked_resp.raise_for_status = mock.Mock()
