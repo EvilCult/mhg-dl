@@ -13,3 +13,5 @@ dependencies = [
 dev = [
     "pytest>=9.0.1",
 ]
+[project.scripts]
+mhg-dl = "mhg_dl.cli:main"
