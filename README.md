@@ -1,8 +1,8 @@
 # mhg-dl
 
-**简体中文名**：mhg-dl — 一个针对 [manhuagui](https://www.manhuagui.com/) 的简易漫画抓取与下载工具  
+**mhg-dl**：又一个 [manhuagui](https://www.manhuagui.com/) 的简易漫画抓取与下载工具  
 
-mhg-dl 提供漫画搜索、抓取、解析和下载功能。
+提供漫画搜索、抓取、解析和下载功能。支持指定分类下载, 及跳过指定章节下载。
 
 ---
 
@@ -38,21 +38,24 @@ uv sync
 
 ## 使用(暂时)
 ```bash
+# 帮助
+python -m mhg_dl.cli -h
+
 # 搜索漫画 e.g. 鬼灭之刃
-uv run -m mhg_dl.cli search 鬼灭之刃
+python -m mhg_dl.cli search 鬼灭之刃
 
 # 取得所有章节
-uv run -m mhg_dl.cli get 19430
+python -m mhg_dl.cli get 19430
 
 # 只下载单行本
-uv run -m mhg_dl.cli get 494 -t 单行本
+python -m mhg_dl.cli get 494 -t 单行本
 
 # 只下载单行本 且从20卷开始下载
-uv run -m mhg_dl.cli get 494 -t 单行本 -s 第20卷
+python -m mhg_dl.cli get 494 -t 单行本 -s 第20卷
 ```
 
 
 
 
 > PS: 不想重复造轮子,但是,总有但是...
-> 下载文件总有各种各种保存的格式, 遇上柯南这种100多卷的, 每次一更新要从头下,真是遭不住!!!
+> 下载文件总有各种各种保存的格式, 遇上柯南这种100多卷的, 每次一更新要从头下,就不太能接受.
