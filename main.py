@@ -1,43 +1,38 @@
 import argparse
+from models import MangaInfo
 from fetcher import manga_fetch, chapter_fetch
-# from downloader import manga_download
+from downloader import manga_download
 
-def select_chapter(chapters: dict[str, dict[str, str]], typ: str, skip: str) -> dict[str, dict[str, str]]:
-    dl_chapters: dict[str, str] = chapters
-
-    if typ != "all":
-        dl_chapters = chapters[typ]
-
-        if skip is not None:
-            skiping: bool = True
-            tmp: dict[str, str] = {}
-            for key, value in dl_chapters.items():
-                if key == skip:
-                    skiping = False
-                if not skiping:
-                    tmp[key] = value
-            dl_chapters = tmp
-
-    return  {typ: dl_chapters}
-
-def main() -> None:
-    parser = argparse.ArgumentParser(description="mhg-dl, 一个简单的漫画下载工具")
-
-    parser.add_argument("--cid", "-c", type=int, default=1, help="漫画cid, 如 https://www.manhuagui.com/comic/**cid**/")
-    parser.add_argument("--type", "-t", type=str, default="all", help="下载内容的类型, 如: 单行本, 单话等")
-    parser.add_argument("--skip", "-s", type=str, default=None, help="跳过之前内容, 从指定章节开始下载, 章节名称需与目录显示一致")
-
-    args = parser.parse_args()
-
-    manga = manga_fetch(str(args.cid))
-
+def download_command(args) -> None:
+    fetch_filters: tuple[str, str] = (args.type, args.skip)
+    manga: MangaInfo = manga_fetch(str(args.cid), fetch_filters)
     if manga.title == "":
-        return None
-
-    manga.chapters = select_chapter(manga.chapters, args.type, args.skip)
+        print("Comic not found")
+        return
 
     manga = chapter_fetch(manga)
-    print(manga)
+    manga_download(manga)
+
+def search_command(args) -> None:
+    pass
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="mhg-dl, a simple comic download tool")
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    # search
+    parser_search = subparsers.add_parser("search", help="Search comic by keyword")
+    parser_search.add_argument("query", type=str, help="Search keyword")
+    parser_search.set_defaults(func=search_command)
+
+    # download
+    parser_get = subparsers.add_parser("get", help="Download comic")
+    parser_get.add_argument("cid", type=int, help="comic id")
+    parser_get.add_argument("-t", "--type", type=str, default="all", help="Type of content to download")
+    parser_get.add_argument("-s", "--skip", type=str, default=None, help="Skip previous content, start from specified chapter")
+    parser_get.set_defaults(func=download_command)
+    args = parser.parse_args()
+    args.func(args)
 
 
 if __name__ == "__main__":

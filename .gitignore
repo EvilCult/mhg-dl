@@ -10,3 +10,6 @@ wheels/
 # Virtual environments
 .venv
 .envrc
+
+# Mac OS
+.DS_Store
