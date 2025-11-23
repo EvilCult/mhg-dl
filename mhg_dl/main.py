@@ -13,7 +13,7 @@ def download_command(args) -> None:
     manga = chapter_fetch(manga)
     manga_download(manga)
 
-    print(f"Download completed: {manga.title}")
+    print(f"(；´∀｀)=3 =3 =3 Finally....Done! -->  {manga.title}")
 
 def search_command(args) -> None:
     results = search_manga(args.query)
