@@ -3,9 +3,9 @@ from bs4 import BeautifulSoup
 from urllib.parse import quote
 # import time
 # import random
-from unpacker import unpack
-from models import MangaInfo
-from config import FAKE_HEADERS, MANGA_URL, CHAPTER_URL, IMAGE_URL
+from mhg_dl.unpacker import unpack
+from mhg_dl.models import MangaInfo
+from mhg_dl.config import FAKE_HEADERS, MANGA_URL, CHAPTER_URL, IMAGE_URL
 
 def manga_fetch(cid: str, fetch_filters: tuple[str, str]) -> MangaInfo:
     url = MANGA_URL.format(comic_id=cid)

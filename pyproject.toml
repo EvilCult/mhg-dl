@@ -1,7 +1,7 @@
 [project]
 name = "mhg-dl"
 version = "0.1.0"
-description = "Add your description here"
+description = "mhg-dl, a simple comic download tool for manhuagui.com"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
