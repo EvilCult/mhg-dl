@@ -61,7 +61,7 @@ mhg-dl get 494 -t 单行本 -s 第20卷
 ## 构建
 
 ```bash
-git@github.com:EvilCult/mhg-dl.git
+git clone git@github.com:EvilCult/mhg-dl.git
 
 cd mhg-dl
 
