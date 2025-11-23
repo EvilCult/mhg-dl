@@ -1,8 +1,13 @@
 # mhg-dl
+[![PyPI Version](https://img.shields.io/pypi/v/mhg-dl.svg)](https://pypi.org/project/mhg-dl/)
+[![GitHub stars](https://img.shields.io/github/stars/evilcult/mhg-dl.svg?style=social&label=Stars)](https://github.com/evilcult/mhg-dl/stargazers)
+[![License](https://img.shields.io/pypi/l/mhg-dl.svg)](https://github.com/evilcult/mhg-dl)
 
 **mhg-dl**：又一个 [manhuagui](https://www.manhuagui.com/) 的简易漫画抓取与下载工具  
 
 提供漫画搜索、抓取、解析和下载功能。支持指定分类下载, 及跳过指定章节下载。
+
+
 
 ---
 

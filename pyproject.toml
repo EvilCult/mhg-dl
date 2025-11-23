@@ -9,6 +9,7 @@ dependencies = [
     "lzstring>=1.0.4",
     "requests>=2.32.5",
 ]
+license = { file = "LICENSE" }
 [dependency-groups]
 dev = [
     "pytest>=9.0.1",
