@@ -20,12 +20,40 @@
 - [x] 漫画规则分析
 - [x] 漫画下载, 分类下载, 跳过章节
 - [x] 搜索漫画
+- [x] 发布文件包
 - [ ] 搜索详细信息
-- [ ] 发布文件包
+- [ ] 指定目录
+- [ ] 指定下载章节
 
 ---
 
 ## 安装
+```bash
+uv tool install mhg-dl
+# or
+pip install mhg-dl
+```
+
+## 使用
+```bash
+# 帮助
+mhg-dl -h
+
+# 搜索漫画 e.g. 鬼灭之刃
+mhg-dl search 鬼灭之刃
+
+# 取得所有章节
+mhg-dl get 19430
+
+# 只下载单行本
+mhg-dl get 494 -t 单行本
+
+# 只下载单行本 且从20卷开始下载
+mhg-dl get 494 -t 单行本 -s 第20卷
+```
+
+---
+## 构建
 
 ```bash
 git@github.com:EvilCult/mhg-dl.git
@@ -34,25 +62,13 @@ cd mhg-dl
 
 uv sync
 
+uv run -m mhg_dl.cli -h
+
+uv build
+
+uv tool install dist/*****.whl
 ```
 
-## 使用(暂时)
-```bash
-# 帮助
-python -m mhg_dl.cli -h
-
-# 搜索漫画 e.g. 鬼灭之刃
-python -m mhg_dl.cli search 鬼灭之刃
-
-# 取得所有章节
-python -m mhg_dl.cli get 19430
-
-# 只下载单行本
-python -m mhg_dl.cli get 494 -t 单行本
-
-# 只下载单行本 且从20卷开始下载
-python -m mhg_dl.cli get 494 -t 单行本 -s 第20卷
-```
 
 
 
