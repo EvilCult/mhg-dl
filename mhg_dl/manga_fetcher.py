@@ -1,8 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import quote
-# import time
-# import random
+import time
+import random
 from mhg_dl.unpacker import unpack
 from mhg_dl.models import MangaInfo
 from mhg_dl.config import FAKE_HEADERS, MANGA_URL, CHAPTER_URL, IMAGE_URL
@@ -88,9 +88,9 @@ def chapter_fetch(manga: MangaInfo) -> MangaInfo:
         for chapter_name, chapter_id in chapters.items():
             chapter_url: str = CHAPTER_URL.format(comic_id=manga.cid, chapter_id=chapter_id)
             
-            # Random sleep 防止封禁
-            # seconds = random.uniform(0, 2) 
-            # time.sleep(seconds)
+            # Random sleep
+            seconds = random.uniform(0, 2) 
+            time.sleep(seconds)
 
             print(f"Analyzing: {chapter_name} ({chapter_url})")
             images_data = analyze_chapter(chapter_url)

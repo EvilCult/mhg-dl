@@ -1,7 +1,7 @@
 import os
 import requests
-# import time
-# import random
+import time
+import random
 from mhg_dl.models import MangaInfo
 from mhg_dl.config import FAKE_HEADERS
 
@@ -42,8 +42,8 @@ def download_image(url: str, path: str) -> None:
         print(f"Downloading: {url}")
 
         # Random sleep 防止封禁
-        # seconds = random.uniform(0, 2) 
-        # time.sleep(seconds)
+        seconds = random.uniform(0, 2) 
+        time.sleep(seconds)
 
         resp = requests.get(url, headers=FAKE_HEADERS)
         resp.raise_for_status()
