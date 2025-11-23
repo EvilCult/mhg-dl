@@ -16,7 +16,7 @@ def manga_fetch(cid: str, fetch_filters: tuple[str, str]) -> MangaInfo:
         resp.raise_for_status()
     except Exception :
         print("The comic id is wrong or the comic does not exist.")
-        return MangaInfo(cid=cid, title="", cover=None, author=None, chapters={})
+        return MangaInfo(cid=cid, title="")
 
     soup = BeautifulSoup(resp.text, "html.parser")
 
@@ -26,11 +26,11 @@ def manga_fetch(cid: str, fetch_filters: tuple[str, str]) -> MangaInfo:
     chapter_groups = select_chapter(chapter_groups, typ, skip)
 
     return MangaInfo(
-        cid = cid,
-        title = title,
-        cover = cover,
-        author = author,
-        chapters = chapter_groups
+        cid      = cid,
+        title    = title,
+        cover    = cover,
+        author   = author,
+        chapters =  chapter_groups
     )
 
 def fetch_base_info(soup) -> tuple[str|None, str|None, str|None]:
