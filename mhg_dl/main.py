@@ -23,3 +23,6 @@ def search_command(args) -> None:
 
     for manga in results:
         print(f"[{manga.cid}] | {manga.title} ({manga.year}) - {manga.stat} - {manga.author}")
+
+def info_command(args) -> None:
+    pass
