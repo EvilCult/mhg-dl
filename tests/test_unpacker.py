@@ -1,7 +1,7 @@
 import sys
 import types
 import json
-from unpacker import fix_illegal_json_str, parse_json, unpack
+from mhg_dl.unpacker import fix_illegal_json_str, parse_json, unpack
 
 fake_lz = types.ModuleType("lzstring")
 class _FakeLZObj:

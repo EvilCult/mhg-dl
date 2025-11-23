@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 
-from fetcher import (
+from mhg_dl.manga_fetcher import (
     manga_fetch,
     MangaInfo,
     fetch_base_info,
@@ -63,7 +63,7 @@ def test_manga_fetch_handles_http_error(monkeypatch):
         raise requests.RequestException("network")
 
     monkeypatch.setattr("requests.get", fake_get)
-    info = manga_fetch("no-such-cid")
+    info = manga_fetch("no-such-cid", fetch_filters=("all", None))
     assert isinstance(info, MangaInfo)
     assert info.title == ""
 
@@ -79,7 +79,7 @@ def test_analyze_chapter_uses_unpack(monkeypatch):
     monkeypatch.setattr("requests.get", fake_get)
 
     # patch unpack to return a dict we control
-    monkeypatch.setattr("fetcher.unpack", lambda s: {"files": ["a.jpg"], "sl": {"e0": 1, "e1": 2}, "path": "/p/"})
+    monkeypatch.setattr("mhg_dl.manga_fetcher.unpack", lambda s: {"files": ["a.jpg"], "sl": {"e0": 1, "e1": 2}, "path": "/p/"})
 
     result = analyze_chapter("http://example/chapter.html")
     assert isinstance(result, dict)

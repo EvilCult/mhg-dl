@@ -3,9 +3,9 @@ from bs4 import BeautifulSoup
 from urllib.parse import quote
 # import time
 # import random
-from unpacker import unpack
-from models import MangaInfo
-from config import FAKE_HEADERS, MANGA_URL, CHAPTER_URL, IMAGE_URL
+from mhg_dl.unpacker import unpack
+from mhg_dl.models import MangaInfo
+from mhg_dl.config import FAKE_HEADERS, MANGA_URL, CHAPTER_URL, IMAGE_URL
 
 def manga_fetch(cid: str, fetch_filters: tuple[str, str]) -> MangaInfo:
     url = MANGA_URL.format(comic_id=cid)
@@ -16,7 +16,7 @@ def manga_fetch(cid: str, fetch_filters: tuple[str, str]) -> MangaInfo:
         resp.raise_for_status()
     except Exception :
         print("The comic id is wrong or the comic does not exist.")
-        return MangaInfo(cid=cid, title="", cover=None, author=None, chapters={})
+        return MangaInfo(cid=cid, title="")
 
     soup = BeautifulSoup(resp.text, "html.parser")
 
@@ -26,11 +26,11 @@ def manga_fetch(cid: str, fetch_filters: tuple[str, str]) -> MangaInfo:
     chapter_groups = select_chapter(chapter_groups, typ, skip)
 
     return MangaInfo(
-        cid = cid,
-        title = title,
-        cover = cover,
-        author = author,
-        chapters = chapter_groups
+        cid      = cid,
+        title    = title,
+        cover    = cover,
+        author   = author,
+        chapters =  chapter_groups
     )
 
 def fetch_base_info(soup) -> tuple[str|None, str|None, str|None]:

@@ -2,8 +2,8 @@ import os
 import requests
 # import time
 # import random
-from models import MangaInfo
-from config import FAKE_HEADERS
+from mhg_dl.models import MangaInfo
+from mhg_dl.config import FAKE_HEADERS
 
 def manga_download(manga: MangaInfo) -> None:
     title: str = manga.title
