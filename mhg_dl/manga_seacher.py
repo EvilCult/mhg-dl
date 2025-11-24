@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 from mhg_dl.config import FAKE_HEADERS, SEARCH_URL
 from mhg_dl.models import MangaInfo
+from mhg_dl.manga_fetcher import manga_fetch
 
 def search_manga(query: str) -> list[MangaInfo]:
     results: list[MangaInfo] = []
@@ -53,3 +54,9 @@ def has_next_page(soup: BeautifulSoup, current_page: int) -> bool:
         return True
     
     return False
+
+def show_manga_details(cid: str) -> MangaInfo | None:
+    manga: MangaInfo = manga_fetch(cid, ("all", None))
+
+    return manga
+

@@ -1,7 +1,17 @@
 # mhg-dl
+
 [![PyPI Version](https://img.shields.io/pypi/v/mhg-dl.svg)](https://pypi.org/project/mhg-dl/)
+[![Downloads](https://pepy.tech/badge/mhg-dl)](https://pepy.tech/project/mhg-dl)
+
+
+![Platform](https://img.shields.io/badge/platform-CLI-lightgrey)
+![uv](https://img.shields.io/badge/built%20with-uv-5f43e9)
+![ruff](https://img.shields.io/badge/lint-ruff-blue)
+[![License](https://img.shields.io/github/license/evilcult/mhg-dl.svg)](LICENSE)
+
+
 [![GitHub stars](https://img.shields.io/github/stars/evilcult/mhg-dl.svg?style=social&label=Stars)](https://github.com/evilcult/mhg-dl/stargazers)
-[![License](https://img.shields.io/pypi/l/mhg-dl.svg)](https://github.com/evilcult/mhg-dl)
+
 
 **mhg-dl**：又一个 [manhuagui](https://www.manhuagui.com/) 的简易漫画抓取与下载工具  
 
@@ -26,9 +36,11 @@
 - [x] 漫画下载, 分类下载, 跳过章节
 - [x] 搜索漫画
 - [x] 发布文件包
-- [ ] 搜索详细信息
-- [ ] 指定目录
+- [x] 搜索详细信息
+- [ ] 出错自动重试
+- [ ] 指定输出目录
 - [ ] 指定下载章节
+- [ ] 优化输出模式
 
 ---
 
@@ -46,6 +58,9 @@ mhg-dl -h
 
 # 搜索漫画 e.g. 鬼灭之刃
 mhg-dl search 鬼灭之刃
+
+# 查看详细信息
+mhg-dl info 19430
 
 # 取得所有章节
 mhg-dl get 19430

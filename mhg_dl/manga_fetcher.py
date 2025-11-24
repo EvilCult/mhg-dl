@@ -1,8 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import quote
-# import time
-# import random
+import time
+import random
 from mhg_dl.unpacker import unpack
 from mhg_dl.models import MangaInfo
 from mhg_dl.config import FAKE_HEADERS, MANGA_URL, CHAPTER_URL, IMAGE_URL
@@ -20,29 +20,30 @@ def manga_fetch(cid: str, fetch_filters: tuple[str, str]) -> MangaInfo:
 
     soup = BeautifulSoup(resp.text, "html.parser")
 
-    title, cover, author = fetch_base_info(soup)
+    manga: MangaInfo = fetch_base_info(cid, soup)
     
     chapter_groups = fetch_chapter_list(soup)
     chapter_groups = select_chapter(chapter_groups, typ, skip)
+    manga.chapters = chapter_groups
 
-    return MangaInfo(
-        cid      = cid,
-        title    = title,
-        cover    = cover,
-        author   = author,
-        chapters =  chapter_groups
+    return manga
+
+def fetch_base_info(cid: str, soup: BeautifulSoup) -> MangaInfo:
+    title_elem = soup.select_one(".book-title > h1")
+    cover_elem = soup.select_one(".book-cover > p > img")
+    author_elem = soup.select_one(".book-detail > ul.detail-list > li:nth-child(2) > span:nth-child(2) > a")
+    year_elem = soup.select_one(".book-detail > ul.detail-list > li:nth-child(1) > span:nth-child(1) > a")
+    stat_elem = soup.select_one(".book-detail > ul.detail-list > li:nth-child(4) > span")
+
+    manga = MangaInfo(
+        cid    = cid,
+        title  = title_elem.text.strip() if title_elem else None,
+        cover  = "https:" + cover_elem["src"] if cover_elem else None,
+        author = author_elem.text.strip() if author_elem else None,
+        year   = year_elem.text.strip() if year_elem else None,
+        stat   = stat_elem.text.strip().split("：")[1] if stat_elem and "：" in stat_elem.text else None,
     )
-
-def fetch_base_info(soup) -> tuple[str|None, str|None, str|None]:
-    title = soup.select_one("h1").get_text(strip=True)
-
-    cover_tag = soup.select_one(".book-cover > p > img")
-    cover = "https:" + cover_tag["src"] if cover_tag else None
-
-    author_tag = soup.select_one("ul.detail-list.cf > li:nth-child(2) > span:nth-child(2) > a")
-    author = author_tag.get_text(strip=True) if author_tag else None
-
-    return title, cover, author
+    return manga
 
 def fetch_chapter_list(soup) -> dict[str, dict[str, str]]:
     chapter_groups: dict[str, dict[str, str]] = {}
@@ -65,32 +66,32 @@ def fetch_chapter_list(soup) -> dict[str, dict[str, str]]:
     return chapter_groups
 
 def select_chapter(chapters: dict[str, dict[str, str]], typ: str, skip: str) -> dict[str, dict[str, str]]:
-    dl_chapters: dict[str, str] = chapters
+    if typ == "all":
+        return chapters
 
-    if typ != "all":
-        dl_chapters = chapters[typ]
-
-        if skip is not None:
-            skiping: bool = True
-            tmp: dict[str, str] = {}
-            for key, value in dl_chapters.items():
-                if key == skip:
-                    skiping = False
-                if not skiping:
-                    tmp[key] = value
-            dl_chapters = tmp
+    dl_chapters: dict[str, str] = chapters[typ]
+    if skip is not None:
+        skiping: bool = True
+        tmp: dict[str, str] = {}
+        for key, value in dl_chapters.items():
+            if key == skip:
+                skiping = False
+            if not skiping:
+                tmp[key] = value
+        dl_chapters = tmp
 
     return  {typ: dl_chapters}
 
 def chapter_fetch(manga: MangaInfo) -> MangaInfo:
+    print("(*≧▽≦) Let's go!\n")
     for typ, chapters in manga.chapters.items():
         print(f"Analyzing: {typ}")
         for chapter_name, chapter_id in chapters.items():
             chapter_url: str = CHAPTER_URL.format(comic_id=manga.cid, chapter_id=chapter_id)
             
-            # Random sleep 防止封禁
-            # seconds = random.uniform(0, 2) 
-            # time.sleep(seconds)
+            # Random sleep
+            seconds = random.uniform(0, 2) 
+            time.sleep(seconds)
 
             print(f"Analyzing: {chapter_name} ({chapter_url})")
             images_data = analyze_chapter(chapter_url)

@@ -1,7 +1,7 @@
 import os
 import requests
-# import time
-# import random
+import time
+import random
 from mhg_dl.models import MangaInfo
 from mhg_dl.config import FAKE_HEADERS
 
@@ -19,12 +19,12 @@ def manga_download(manga: MangaInfo) -> None:
         download_image(cover, cover_path)
 
     for typ, chapters in manga.chapters.items():
-        print(f"Downloading: {typ}")
+        print(f"\n(ง •̀_•́)ง Starting...: {typ}")
         type_dir = os.path.join(download_dir, typ)
         os.makedirs(type_dir, exist_ok=True)
 
         for chapter_name, image_urls in chapters.items():
-            print(f"Downloading: {chapter_name}")
+            print(f"\n٩(๑>◡<๑)۶ Switching: {chapter_name}")
             chapter_dir = os.path.join(type_dir, chapter_name)
             os.makedirs(chapter_dir, exist_ok=True)
 
@@ -42,8 +42,8 @@ def download_image(url: str, path: str) -> None:
         print(f"Downloading: {url}")
 
         # Random sleep 防止封禁
-        # seconds = random.uniform(0, 2) 
-        # time.sleep(seconds)
+        seconds = random.uniform(0, 2) 
+        time.sleep(seconds)
 
         resp = requests.get(url, headers=FAKE_HEADERS)
         resp.raise_for_status()
