@@ -37,7 +37,7 @@
 - [x] 搜索漫画
 - [x] 发布文件包
 - [x] 搜索详细信息
-- [ ] 出错自动重试
+- [x] 出错自动重试
 - [ ] 指定输出目录
 - [ ] 指定下载章节
 - [ ] 优化输出模式
@@ -46,9 +46,16 @@
 
 ## 安装
 ```bash
-uv tool install mhg-dl
-# or
 pip install mhg-dl
+# or
+uv tool install mhg-dl
+```
+
+## 更新
+```bash
+pip install --upgrade mhg-dl
+# or
+uv tool upgrade mhg-dl
 ```
 
 ## 使用

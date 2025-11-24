@@ -100,12 +100,19 @@ def chapter_fetch(manga: MangaInfo) -> MangaInfo:
 
 def analyze_chapter(chapter_url: str) -> dict[str, any]:
     chapter_data: dict[str, any] = {}
-    try:
-        resp = requests.get(chapter_url, headers=FAKE_HEADERS)
-        resp.raise_for_status()
-    except Exception:
-        print(f"Unable to access: {chapter_url}")
-        return chapter_data
+    max_retries = 3
+    for attempt in range(1, max_retries + 1):
+        try:
+            resp = requests.get(chapter_url, headers=FAKE_HEADERS)
+            resp.raise_for_status()
+            break
+        except Exception:
+            if attempt < max_retries:
+                print(f"Attempt {attempt} failed for {chapter_url}")
+                time.sleep(5)
+            else:
+                print(f"Failed to access chapter after {max_retries} attempts: {chapter_url}")
+                return chapter_data
 
     soup = BeautifulSoup(resp.text, "html.parser")
     script_tags = soup.find_all("script")

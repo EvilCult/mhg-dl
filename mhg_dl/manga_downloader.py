@@ -38,16 +38,29 @@ def download_image(url: str, path: str) -> None:
     if os.path.exists(path):
         print(f"Image already exists: {path}")
         return
-    try:
-        print(f"Downloading: {url}")
+    max_retries = 3
+    for attempt in range(1, max_retries + 1):
+        try:
+            if attempt == 1:
+                print(f"✓ Downloading: {url}")
+            else:
+                print(f"↻ Retry {attempt - 1}: {url}")
 
-        # Random sleep 防止封禁
-        seconds = random.uniform(0, 2) 
-        time.sleep(seconds)
+            # Random sleep 防止封禁
+            seconds = random.uniform(0, 2)
+            time.sleep(seconds)
 
-        resp = requests.get(url, headers=FAKE_HEADERS)
-        resp.raise_for_status()
-        with open(path, "wb") as f:
-            f.write(resp.content)
-    except Exception as e:
-        print(f"Failed to download image from {url}: {e}")
+            resp = requests.get(url, headers=FAKE_HEADERS, timeout=10)
+            resp.raise_for_status()
+
+            with open(path, "wb") as f:
+                f.write(resp.content)
+
+            return
+
+        except Exception as e:
+            if attempt < max_retries:
+                print(f"↩︎ Cooling down before retrying... ({e})")
+                time.sleep(5)
+            else:
+                print(f"✗ Failed after {max_retries} tries: {url} ({e})")
