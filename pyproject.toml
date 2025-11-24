@@ -6,7 +6,7 @@ description = "mhg-dl, a simple comic download tool for manhuagui.com"
 readme = "README.md"
 license = { file = "LICENSE" }
 
-authors = [{ name = "EvilCult", email = "" }]
+authors = [{ name = "EvilCult", email = "void@evilcult.dev" }]
 maintainers = [{ name = "EvilCult" }]
 keywords = ["comic", "downloader", "manhuagui", "mhg"]
 

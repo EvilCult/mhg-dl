@@ -6,7 +6,7 @@
 
 ![Platform](https://img.shields.io/badge/platform-CLI-lightgrey)
 ![uv](https://img.shields.io/badge/built%20with-uv-5f43e9)
-![ruff](https://img.shields.io/badge/lint-ruff-blue)
+![ruff](https://img.shields.io/badge/lint-ruff-red)
 [![License](https://img.shields.io/github/license/evilcult/mhg-dl.svg)](LICENSE)
 
 
