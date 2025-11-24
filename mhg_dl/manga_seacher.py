@@ -55,8 +55,8 @@ def has_next_page(soup: BeautifulSoup, current_page: int) -> bool:
     
     return False
 
-def show_manga_details(cid: str) -> MangaInfo | None:
-    manga: MangaInfo = manga_fetch(cid, ("all", None))
+def show_manga_details(cid: str) -> MangaInfo:
+    manga: MangaInfo = manga_fetch(cid)
 
     return manga
 
