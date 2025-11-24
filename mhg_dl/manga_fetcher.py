@@ -7,9 +7,8 @@ from mhg_dl.unpacker import unpack
 from mhg_dl.models import MangaInfo
 from mhg_dl.config import FAKE_HEADERS, MANGA_URL, CHAPTER_URL, IMAGE_URL
 
-def manga_fetch(cid: str, fetch_filters: tuple[str, str]) -> MangaInfo:
+def manga_fetch(cid: str,) -> MangaInfo:
     url = MANGA_URL.format(comic_id=cid)
-    typ, skip = tuple(fetch_filters)
 
     try:
         resp = requests.get(url, headers=FAKE_HEADERS)
@@ -23,7 +22,6 @@ def manga_fetch(cid: str, fetch_filters: tuple[str, str]) -> MangaInfo:
     manga: MangaInfo = fetch_base_info(cid, soup)
     
     chapter_groups = fetch_chapter_list(soup)
-    chapter_groups = select_chapter(chapter_groups, typ, skip)
     manga.chapters = chapter_groups
 
     return manga
@@ -65,7 +63,7 @@ def fetch_chapter_list(soup) -> dict[str, dict[str, str]]:
 
     return chapter_groups
 
-def select_chapter(chapters: dict[str, dict[str, str]], typ: str, skip: str) -> dict[str, dict[str, str]]:
+def filter_chapter(chapters: dict[str, dict[str, str]], typ: str, skip: str, pick: str) -> dict[str, dict[str, str]]:
     if typ == "all":
         return chapters
 
@@ -78,6 +76,9 @@ def select_chapter(chapters: dict[str, dict[str, str]], typ: str, skip: str) -> 
                 skiping = False
             if not skiping:
                 tmp[key] = value
+        dl_chapters = tmp
+    elif pick is not None:
+        tmp: dict[str, str] = {pick: dl_chapters[pick]} if pick in dl_chapters else {}
         dl_chapters = tmp
 
     return  {typ: dl_chapters}
@@ -100,12 +101,19 @@ def chapter_fetch(manga: MangaInfo) -> MangaInfo:
 
 def analyze_chapter(chapter_url: str) -> dict[str, any]:
     chapter_data: dict[str, any] = {}
-    try:
-        resp = requests.get(chapter_url, headers=FAKE_HEADERS)
-        resp.raise_for_status()
-    except Exception:
-        print(f"Unable to access: {chapter_url}")
-        return chapter_data
+    max_retries = 3
+    for attempt in range(1, max_retries + 1):
+        try:
+            resp = requests.get(chapter_url, headers=FAKE_HEADERS)
+            resp.raise_for_status()
+            break
+        except Exception:
+            if attempt < max_retries:
+                print(f"Attempt {attempt} failed for {chapter_url}")
+                time.sleep(5)
+            else:
+                print(f"Failed to access chapter after {max_retries} attempts: {chapter_url}")
+                return chapter_data
 
     soup = BeautifulSoup(resp.text, "html.parser")
     script_tags = soup.find_all("script")

@@ -20,6 +20,7 @@ def main() -> None:
     parser_get.add_argument("cid", type=int, help="comic id")
     parser_get.add_argument("-t", "--type", type=str, default="all", help="Type of content to download")
     parser_get.add_argument("-s", "--skip", type=str, default=None, help="Skip previous content, start from specified chapter")
+    parser_get.add_argument("-p", "--pick", type=str, default=".", help="Pick a specific chapter to download")
     parser_get.set_defaults(func=download_command)
 
     args = parser.parse_args()

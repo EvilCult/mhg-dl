@@ -37,18 +37,25 @@
 - [x] 搜索漫画
 - [x] 发布文件包
 - [x] 搜索详细信息
-- [ ] 出错自动重试
+- [x] 出错自动重试
+- [x] 指定下载章节
 - [ ] 指定输出目录
-- [ ] 指定下载章节
 - [ ] 优化输出模式
 
 ---
 
 ## 安装
 ```bash
-uv tool install mhg-dl
-# or
 pip install mhg-dl
+# or
+uv tool install mhg-dl
+```
+
+## 更新
+```bash
+pip install --upgrade mhg-dl
+# or
+uv tool upgrade mhg-dl
 ```
 
 ## 使用
@@ -59,17 +66,20 @@ mhg-dl -h
 # 搜索漫画 e.g. 鬼灭之刃
 mhg-dl search 鬼灭之刃
 
-# 查看详细信息
+# 查看漫画详细信息
 mhg-dl info 19430
 
-# 取得所有章节
+# 下载所有内容
 mhg-dl get 19430
 
-# 只下载单行本
+# 仅下载 ‘单行本’ 分类的内容
 mhg-dl get 494 -t 单行本
 
-# 只下载单行本 且从20卷开始下载
+# 仅下载 ‘单行本’ 的 ‘第20卷’ 及以后内容
 mhg-dl get 494 -t 单行本 -s 第20卷
+
+# 仅下载 ‘单行本’ 的 ‘第20卷’
+mhg-dl get 494 -t 单行本 -p 第20卷
 ```
 
 ---
@@ -88,10 +98,3 @@ uv build
 
 uv tool install dist/*****.whl
 ```
-
-
-
-
-
-> PS: 不想重复造轮子,但是,总有但是...
-> 下载文件总有各种各种保存的格式, 遇上柯南这种100多卷的, 每次一更新要从头下,就不太能接受.

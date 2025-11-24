@@ -1,18 +1,38 @@
 [project]
+requires-python = ">=3.12"
 name = "mhg-dl"
 version = "0.3.0"
 description = "mhg-dl, a simple comic download tool for manhuagui.com"
 readme = "README.md"
-requires-python = ">=3.12"
+license = { file = "LICENSE" }
+
+authors = [{ name = "EvilCult", email = "" }]
+maintainers = [{ name = "EvilCult" }]
+keywords = ["comic", "downloader", "manhuagui", "mhg"]
+
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: Apache Software License",
+    "Development Status :: 4 - Beta",
+    "Topic :: Multimedia :: Graphics",
+]
+
 dependencies = [
     "bs4>=0.0.2",
     "lzstring>=1.0.4",
     "requests>=2.32.5",
 ]
-license = { file = "LICENSE" }
+
 [dependency-groups]
 dev = [
     "pytest>=9.0.1",
 ]
+
 [project.scripts]
 mhg-dl = "mhg_dl.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/evilcult/mhg-dl"
+Source = "https://github.com/evilcult/mhg-dl"
+Issues = "https://github.com/evilcult/mhg-dl/issues"
