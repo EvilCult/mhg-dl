@@ -1,7 +1,7 @@
 # mhg-dl
 
 [![PyPI Version](https://img.shields.io/pypi/v/mhg-dl.svg)](https://pypi.org/project/mhg-dl/)
-[![Downloads](https://pepy.tech/badge/mhg-dl)](https://pepy.tech/project/mhg-dl)
+![Downloads](https://static.pepy.tech/badge/mhg-dl?x=42)
 
 
 ![Platform](https://img.shields.io/badge/platform-CLI-lightgrey)
