@@ -1,6 +1,10 @@
+import os
+import time
+import random
 from mhg_dl.models import MangaInfo
-from mhg_dl.manga_fetcher import manga_fetch, filter_chapter, chapter_fetch
-from mhg_dl.manga_downloader import manga_download
+from mhg_dl.config import CHAPTER_URL
+from mhg_dl.manga_fetcher import manga_fetch, filter_chapter, get_chapter_image_urls
+from mhg_dl.manga_downloader import download_chapter, download_image
 from mhg_dl.manga_seacher import search_manga, show_manga_details
 
 def download_command(args) -> None:
@@ -11,8 +15,33 @@ def download_command(args) -> None:
     
     manga.chapters = filter_chapter(manga.chapters, args.type, args.skip, args.pick)
 
-    manga = chapter_fetch(manga)
-    manga_download(manga)
+    # Prepare download directory
+    title = manga.title
+    author = manga.author
+    manga_dir_name = f"{title} - {author}" if author else title
+    download_dir = os.path.join(os.getcwd(), manga_dir_name)
+    os.makedirs(download_dir, exist_ok=True)
+
+    # Download cover
+    if manga.cover:
+        cover_path = os.path.join(download_dir, "cover.jpg")
+        download_image(manga.cover, cover_path)
+
+    print("(*≧▽≦) Let's go!\n")
+    for typ, chapters in manga.chapters.items():
+        print(f"\n(ง •̀_•́)ง Starting...: {typ}")
+        type_dir = os.path.join(download_dir, typ)
+        os.makedirs(type_dir, exist_ok=True)
+
+        for chapter_name, chapter_id in chapters.items():
+            chapter_url = CHAPTER_URL.format(comic_id=manga.cid, chapter_id=chapter_id)
+            
+            # Random sleep
+            seconds = random.uniform(0, 2) 
+            time.sleep(seconds)
+
+            image_urls = get_chapter_image_urls(manga.cid, chapter_url)
+            download_chapter(chapter_name, image_urls, type_dir)
 
     print(f"\n(*´Д｀)=3 Done! -->  {manga.title}")
 
