@@ -2,10 +2,9 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.parse import quote
 import time
-import random
 from mhg_dl.unpacker import unpack
 from mhg_dl.models import MangaInfo
-from mhg_dl.config import FAKE_HEADERS, MANGA_URL, CHAPTER_URL, IMAGE_URL
+from mhg_dl.config import FAKE_HEADERS, MANGA_URL, IMAGE_URL
 
 def manga_fetch(cid: str,) -> MangaInfo:
     url = MANGA_URL.format(comic_id=cid)
@@ -83,21 +82,13 @@ def filter_chapter(chapters: dict[str, dict[str, str]], typ: str, skip: str, pic
 
     return  {typ: dl_chapters}
 
-def chapter_fetch(manga: MangaInfo) -> MangaInfo:
-    print("(*≧▽≦) Let's go!\n")
-    for typ, chapters in manga.chapters.items():
-        print(f"Analyzing: {typ}")
-        for chapter_name, chapter_id in chapters.items():
-            chapter_url: str = CHAPTER_URL.format(comic_id=manga.cid, chapter_id=chapter_id)
-            
-            # Random sleep
-            seconds = random.uniform(0, 2) 
-            time.sleep(seconds)
-
-            print(f"Analyzing: {chapter_name} ({chapter_url})")
-            images_data = analyze_chapter(chapter_url)
-            chapters[chapter_name] = make_img_list(images_data)
-    return manga
+def get_chapter_image_urls(cid: str, chapter_url: str) -> list[str]:
+    """
+    Fetch image URLs for a single chapter.
+    """
+    print(f"Analyzing: {chapter_url}")
+    images_data = analyze_chapter(chapter_url)
+    return make_img_list(images_data)
 
 def analyze_chapter(chapter_url: str) -> dict[str, any]:
     chapter_data: dict[str, any] = {}

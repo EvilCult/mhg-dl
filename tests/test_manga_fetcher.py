@@ -26,12 +26,14 @@ def test_fetch_base_info_and_chapter_list():
     html = '''
     <html>
       <body>
-        <h1>测试漫</h1>
+        <div class="book-title"><h1>测试漫</h1></div>
         <div class="book-cover"><p><img src="//cover.example/img.jpg"/></p></div>
-        <ul class="detail-list cf">
-          <li></li>
-          <li><span></span><span><a href="/author/1">作者名</a></span></li>
-        </ul>
+        <div class="book-detail">
+            <ul class="detail-list cf">
+            <li></li>
+            <li><span></span><span><a href="/author/1">作者名</a></span></li>
+            </ul>
+        </div>
         <h4><span>单话</span></h4>
         <div class="chapter-list">
           <ul>
@@ -44,10 +46,12 @@ def test_fetch_base_info_and_chapter_list():
     '''
 
     soup = BeautifulSoup(html, "html.parser")
-    title, cover, author = fetch_base_info(soup)
-    assert title == "测试漫"
-    assert cover == "https://cover.example/img.jpg"
-    assert author == "作者名"
+    # Updated: fetch_base_info now takes cid and returns MangaInfo
+    manga = fetch_base_info("123", soup)
+    assert isinstance(manga, MangaInfo)
+    assert manga.title == "测试漫"
+    assert manga.cover == "https://cover.example/img.jpg"
+    assert manga.author == "作者名"
 
     chapter_groups = fetch_chapter_list(soup)
     assert isinstance(chapter_groups, dict)
@@ -63,7 +67,7 @@ def test_manga_fetch_handles_http_error(monkeypatch):
         raise requests.RequestException("network")
 
     monkeypatch.setattr("requests.get", fake_get)
-    info = manga_fetch("no-such-cid", fetch_filters=("all", None))
+    info = manga_fetch("no-such-cid")
     assert isinstance(info, MangaInfo)
     assert info.title == ""
 
@@ -79,7 +83,8 @@ def test_analyze_chapter_uses_unpack(monkeypatch):
     monkeypatch.setattr("requests.get", fake_get)
 
     # patch unpack to return a dict we control
-    monkeypatch.setattr("mhg_dl.manga_fetcher.unpack", lambda s: {"files": ["a.jpg"], "sl": {"e0": 1, "e1": 2}, "path": "/p/"})
+    # Updated: sl keys changed to e and m
+    monkeypatch.setattr("mhg_dl.manga_fetcher.unpack", lambda s: {"files": ["a.jpg"], "sl": {"e": 1, "m": 2}, "path": "/p/"})
 
     result = analyze_chapter("http://example/chapter.html")
     assert isinstance(result, dict)
@@ -87,13 +92,15 @@ def test_analyze_chapter_uses_unpack(monkeypatch):
 
 
 def test_make_img_list_builds_urls():
+    # Updated: sl keys changed to e and m
     chapter_data = {
         "files": ["1.jpg", "2.jpg"],
         "path": "/path/to/",
-        "sl": {"e0": 111, "e1": 222},
+        "sl": {"e": 111, "m": 222},
     }
     result = make_img_list(chapter_data)
     assert len(result) == 2
     for file_name, url in zip(chapter_data["files"], result):
         assert file_name in url
-        assert str(chapter_data["sl"]["e0"]) in url
+        assert str(chapter_data["sl"]["e"]) in url
+        assert str(chapter_data["sl"]["m"]) in url
