@@ -15,15 +15,15 @@ def download_command(args) -> None:
     
     manga.chapters = filter_chapter(manga.chapters, args.type, args.skip, args.pick)
 
-    # Prepare download directory
-    title = manga.title
-    author = manga.author
+    title          = manga.title
+    author         = manga.author
     manga_dir_name = f"{title} - {author}" if author else title
-    download_dir = os.path.join(os.getcwd(), manga_dir_name)
+
+    root_dir       = args.output if args.output != './' else os.getcwd()
+    download_dir   = os.path.join(root_dir, manga_dir_name)
     os.makedirs(download_dir, exist_ok=True)
 
     print("\n(•̤̀ᵕ•̤ )ᵒᵏᵎᵎᵎᵎ \n")
-    # Download cover
     if manga.cover:
         cover_path = os.path.join(download_dir, "cover.jpg")
         print("(ง •̀_•́)ง Finding Cover \n")
