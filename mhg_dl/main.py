@@ -22,12 +22,14 @@ def download_command(args) -> None:
     download_dir = os.path.join(os.getcwd(), manga_dir_name)
     os.makedirs(download_dir, exist_ok=True)
 
+    print("\n(•̤̀ᵕ•̤ )ᵒᵏᵎᵎᵎᵎ \n")
     # Download cover
     if manga.cover:
         cover_path = os.path.join(download_dir, "cover.jpg")
+        print("(ง •̀_•́)ง Finding Cover \n")
         download_image(manga.cover, cover_path)
 
-    print("(*≧▽≦) Let's go!\n")
+    print("\n(*≧▽≦) Let's go!\n")
     for typ, chapters in manga.chapters.items():
         print(f"\n(ง •̀_•́)ง Starting...: {typ}")
         type_dir = os.path.join(download_dir, typ)
@@ -60,12 +62,12 @@ def info_command(args) -> None:
     if manga.title is None:
         print("Comic not found.")
         return
-    print(f"Comic id : {manga.cid}")
-    print(f"Title    : {manga.title}")
-    print(f"Author   : {manga.author}")
-    print(f"Year     : {manga.year}")
-    print(f"Status   : {manga.stat}")
-    print(f"Cover    : {manga.cover}")
+    print(f"ID     : {manga.cid}")
+    print(f"Title  : {manga.title}")
+    print(f"Author : {manga.author}")
+    print(f"Year   : {manga.year}")
+    print(f"Status : {manga.stat}")
+    print(f"Cover  : {manga.cover}")
     print("Chapters: (latest 15 chapters)")
     for chap_type, chapters in manga.chapters.items():
         print(f"- {chap_type} : [{len(chapters)}]")
