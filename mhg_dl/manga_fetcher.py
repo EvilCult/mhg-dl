@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import quote
+import lzstring
 import time
 from mhg_dl.unpacker import unpack
 from mhg_dl.models import MangaInfo
@@ -44,6 +45,12 @@ def fetch_base_info(cid: str, soup: BeautifulSoup) -> MangaInfo:
 
 def fetch_chapter_list(soup) -> dict[str, dict[str, str]]:
     chapter_groups: dict[str, dict[str, str]] = {}
+    
+    if soup.find("div", class_="warning-bar") is not None:
+        crypto_key = soup.select("input#__VIEWSTATE")[0].get("value")
+        decoder = lzstring.LZString()
+        chapter_string = decoder.decompressFromBase64(crypto_key)
+        soup = BeautifulSoup(chapter_string, "html.parser")
 
     type_list = [span.get_text(strip=True) for span in soup.select("h4 > span")]
 
