@@ -6,6 +6,7 @@ import time
 from mhg_dl.unpacker import unpack
 from mhg_dl.models import MangaInfo
 from mhg_dl.config import FAKE_HEADERS, MANGA_URL, IMAGE_URL
+from mhg_dl.logger import log
 
 def manga_fetch(cid: str,) -> MangaInfo:
     url = MANGA_URL.format(comic_id=cid)
@@ -14,7 +15,7 @@ def manga_fetch(cid: str,) -> MangaInfo:
         resp = requests.get(url, headers=FAKE_HEADERS)
         resp.raise_for_status()
     except Exception :
-        print("The comic id is wrong or the comic does not exist.")
+        log.error("The comic id is wrong or the comic does not exist.")
         return MangaInfo(cid=cid, title="")
 
     soup = BeautifulSoup(resp.text, "html.parser")
@@ -90,10 +91,7 @@ def filter_chapter(chapters: dict[str, dict[str, str]], typ: str, skip: str, pic
     return  {typ: dl_chapters}
 
 def get_chapter_image_urls(cid: str, chapter_url: str) -> list[str]:
-    """
-    Fetch image URLs for a single chapter.
-    """
-    print(f"Analyzing: {chapter_url}")
+    log.progress(f"Analyzing: {chapter_url}")
     images_data = analyze_chapter(chapter_url)
     return make_img_list(images_data)
 
@@ -107,10 +105,10 @@ def analyze_chapter(chapter_url: str) -> dict[str, any]:
             break
         except Exception:
             if attempt < max_retries:
-                print(f"Attempt {attempt} failed for {chapter_url}")
+                log.info(f"Attempt {attempt} failed for {chapter_url}")
                 time.sleep(5)
             else:
-                print(f"Failed to access chapter after {max_retries} attempts: {chapter_url}")
+                log.error(f"Failed to access chapter after {max_retries} attempts: {chapter_url}")
                 return chapter_data
 
     soup = BeautifulSoup(resp.text, "html.parser")
