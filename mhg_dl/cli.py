@@ -1,5 +1,6 @@
 import argparse
 from mhg_dl.main import download_command, search_command, info_command
+from mhg_dl.logger import log
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="mhg-dl, a simple comic download tool for manhuagui.com")
@@ -26,8 +27,7 @@ def main() -> None:
     parser_get.set_defaults(func=download_command)
 
     args = parser.parse_args()
-    
-    from mhg_dl.logger import log
+
     log.set_verbose(getattr(args, "verbose", False))
 
     args.func(args)
