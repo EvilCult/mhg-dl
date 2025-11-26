@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 from mhg_dl.config import FAKE_HEADERS, SEARCH_URL
 from mhg_dl.models import MangaInfo
 from mhg_dl.manga_fetcher import manga_fetch
+from mhg_dl.logger import log
 
 def search_manga(query: str) -> list[MangaInfo]:
     results: list[MangaInfo] = []
@@ -23,7 +24,7 @@ def search_manga(query: str) -> list[MangaInfo]:
             page += 1
 
         except Exception as e:
-            print(f"Error searching for manga: {e}")
+            log.error(f"Error searching for manga: {e}")
             break
 
     return results

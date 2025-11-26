@@ -4,9 +4,10 @@ import time
 import random
 
 from mhg_dl.config import FAKE_HEADERS
+from mhg_dl.logger import log
 
 def download_chapter(chapter_name: str, image_urls: list[str], save_dir: str) -> None:
-    print(f"\n٩(๑>◡<๑)۶ Downloading: {chapter_name}")
+    log.info(f"Starting: {chapter_name}")
     chapter_dir = os.path.join(save_dir, chapter_name)
     os.makedirs(chapter_dir, exist_ok=True)
 
@@ -14,19 +15,21 @@ def download_chapter(chapter_name: str, image_urls: list[str], save_dir: str) ->
         img_ext  = os.path.splitext(img_url)[1].split("?")[0]
         img_name = f"{idx + 1:03d}{img_ext}"
         img_path = os.path.join(chapter_dir, img_name)
+        display_url = img_url if log.verbose else img_url.split('?')[0].split('/')[-1]
+        log.progress(f"✓ Downloading: {display_url} [{idx + 1}/{len(image_urls)}]")
         download_image(img_url, img_path)
 
 def download_image(url: str, path: str) -> None:
     if os.path.exists(path):
-        print(f"Image already exists: {path}")
+        display_path = path if log.verbose else path.split('/')[-1]
+        log.progress(f"Image already exists: {display_path}")
         return
     max_retries = 3
     for attempt in range(1, max_retries + 1):
         try:
-            if attempt == 1:
-                print(f"✓ Downloading: {url}")
-            else:
-                print(f"↻ Retry {attempt - 1}: {url}")
+            if attempt != 1:
+                display_url = url if log.verbose else url.split('?')[0].split('/')[-1]
+                log.progress(f"↻ Retry {attempt - 1}: {display_url}")
 
             # Random sleep 防止封禁
             seconds = random.uniform(0, 2)
@@ -42,7 +45,7 @@ def download_image(url: str, path: str) -> None:
 
         except Exception as e:
             if attempt < max_retries:
-                print(f"↩︎ Cooling down before retrying... ({e})")
+                log.info(f"↩︎ Cooling down before retrying... ({e})")
                 time.sleep(5)
             else:
-                print(f"✗ Failed after {max_retries} tries: {url} ({e})")
+                log.error(f"✗ Failed after {max_retries} tries: {url} ({e})")

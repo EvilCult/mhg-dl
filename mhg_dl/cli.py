@@ -22,9 +22,14 @@ def main() -> None:
     parser_get.add_argument("-t", "--type", type=str, default="all", help="Type of content to download")
     parser_get.add_argument("-s", "--skip", type=str, default=None, help="Skip previous content, start from specified chapter")
     parser_get.add_argument("-p", "--pick", type=str, default=None, help="Pick a specific chapter to download")
+    parser_get.add_argument("-v", "--verbose", action="store_true", help="Verbose output (disable single-line progress)")
     parser_get.set_defaults(func=download_command)
 
     args = parser.parse_args()
+    
+    from mhg_dl.logger import log
+    log.set_verbose(getattr(args, "verbose", False))
+
     args.func(args)
 
 if __name__ == "__main__":
