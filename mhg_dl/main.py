@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 import random
 from mhg_dl.models import MangaInfo
@@ -9,6 +10,10 @@ from mhg_dl.manga_seacher import search_manga, show_manga_details
 from mhg_dl.logger import log
 
 def download_command(args) -> None:
+    if log.verbose:
+        sys.stdout.reconfigure(line_buffering=True)
+        sys.stderr.reconfigure(line_buffering=True)
+
     manga: MangaInfo = manga_fetch(str(args.cid))
     if manga.title == "":
         log.error("Comic not found")
