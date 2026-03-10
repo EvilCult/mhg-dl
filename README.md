@@ -41,6 +41,7 @@
 - [x] 指定下载章节
 - [x] 流式下载
 - [x] 指定输出目录
+- [x] 指定输出格式
 - [x] 美化输出格式
 
 ---
@@ -75,6 +76,9 @@ mhg-dl get 19430
 
 # 将漫画下载到指定目录 e.g. ~/Pictures
 mhg-dl get 494 -t 单行本 -o ~/Pictures
+
+# 指定下载文件的格式 e.g. cbz [支持zip, rar, cbz, cbr, 默认为目录]
+mhg-dl get 494 -t 单行本 -f cbz
 
 # 仅下载 ‘单行本’ 分类的内容
 mhg-dl get 494 -t 单行本
