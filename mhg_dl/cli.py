@@ -20,6 +20,7 @@ def main() -> None:
     parser_get = subparsers.add_parser("get", help="Download comic")
     parser_get.add_argument("cid", type=int, help="comic id")
     parser_get.add_argument("-o", "--output", type=str, default="./", help="Output directory")
+    parser_get.add_argument("-f", "--filetype", type=str, default="dir", choices=["dir", "zip", "rar", "cbz", "cbr"], help="Output file type, dir or zip")
     parser_get.add_argument("-t", "--type", type=str, default="all", help="Type of content to download")
     parser_get.add_argument("-s", "--skip", type=str, default=None, help="Skip previous content, start from specified chapter")
     parser_get.add_argument("-p", "--pick", type=str, default=None, help="Pick a specific chapter to download")
