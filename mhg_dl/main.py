@@ -8,6 +8,7 @@ from mhg_dl.manga_fetcher import manga_fetch, filter_chapter, get_chapter_image_
 from mhg_dl.manga_downloader import download_chapter, download_image
 from mhg_dl.manga_seacher import search_manga, show_manga_details
 from mhg_dl.logger import log
+from mhg_dl.manga_pack import pack_zip, pack_rar
 
 def download_command(args) -> None:
     if log.verbose:
@@ -47,6 +48,14 @@ def download_command(args) -> None:
 
             image_urls = get_chapter_image_urls(manga.cid, chapter_url)
             download_chapter(chapter_name, image_urls, type_dir)
+
+    filetype = getattr(args, "filetype", "dir")
+    if filetype in ("zip", "cbz"):
+        log.info(f"\nPacking downloaded chapters as .{filetype} archives...")
+        pack_zip(download_dir, filetype)
+    elif filetype in ("rar", "cbr"):
+        log.info(f"\nPacking downloaded chapters as .{filetype} archives...")
+        pack_rar(download_dir, filetype)
 
     log.info(f"\n(*´Д｀)=3 Done! -->  {manga.title}")
 
