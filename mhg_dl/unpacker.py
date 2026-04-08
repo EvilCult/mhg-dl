@@ -1,9 +1,11 @@
-import re
 import json
+import re
+
 import lzstring
 
+
 def unpack(js_str: str) -> dict[str, any] | None:
-    match = re.search(r'return p;}\(\'(.*?)\',(\d+),(\d+),\'(.*?)\'\[', js_str)
+    match = re.search(r"return p;}\(\'(.*?)\',(\d+),(\d+),\'(.*?)\'\[", js_str)
     if match:
         p = match.group(1)
         a = int(match.group(2))
@@ -14,13 +16,15 @@ def unpack(js_str: str) -> dict[str, any] | None:
     else:
         return None
 
+
 def unpack_packed(p, a, c, k) -> str:
     decoder = lzstring.LZString()
     k = decoder.decompressFromBase64(k)
-    k = k.split('|') if isinstance(k, str) else k
+    k = k.split("|") if isinstance(k, str) else k
+
     def e(c_val):
         if c_val < a:
-            s = ''
+            s = ""
         else:
             s = e(c_val // a)
         rem = c_val % a
@@ -36,6 +40,7 @@ def unpack_packed(p, a, c, k) -> str:
         d[e(i)] = val
 
     pattern = re.compile(r"\b(\w+)\b")
+
     def replace(match):
         word = match.group(1)
         return d.get(word, word)
@@ -43,8 +48,9 @@ def unpack_packed(p, a, c, k) -> str:
     result = pattern.sub(replace, p)
     return result
 
+
 def parse_json(unpacked_js) -> dict[str, any] | None:
-    match = re.search(r'\{.*\}', unpacked_js, re.DOTALL)
+    match = re.search(r"\{.*\}", unpacked_js, re.DOTALL)
 
     if match:
         json_str = match.group(0)
@@ -54,15 +60,16 @@ def parse_json(unpacked_js) -> dict[str, any] | None:
 
     return json.loads(json_str)
 
+
 def fix_illegal_json_str(js_str: str) -> str:
-    js_str = re.sub(r'(:\s*),', r': null,', js_str)
+    js_str = re.sub(r"(:\s*),", r": null,", js_str)
 
     empty_keys = re.findall(r'""\s*:', js_str)
     for i in range(len(empty_keys)):
         js_str = js_str.replace('"":', f'"e{i}":', 1)
 
-    js_str = re.sub(r',\s*(?=[}\]])', '', js_str)
+    js_str = re.sub(r",\s*(?=[}\]])", "", js_str)
 
-    js_str = re.sub(r'/+', '/', js_str)
+    js_str = re.sub(r"/+", "/", js_str)
 
     return js_str

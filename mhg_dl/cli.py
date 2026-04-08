@@ -1,9 +1,13 @@
 import argparse
-from mhg_dl.main import download_command, search_command, info_command
+
 from mhg_dl.logger import log
+from mhg_dl.main import download_command, info_command, search_command
+
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="mhg-dl, a simple comic download tool for manhuagui.com")
+    parser = argparse.ArgumentParser(
+        description="mhg-dl, a simple comic download tool for manhuagui.com"
+    )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     # search
@@ -12,19 +16,49 @@ def main() -> None:
     parser_search.set_defaults(func=search_command)
 
     # info
-    parser_info = subparsers.add_parser("info", help="Get comic information by comic id")
+    parser_info = subparsers.add_parser(
+        "info", help="Get comic information by comic id"
+    )
     parser_info.add_argument("cid", type=int, help="comic id")
     parser_info.set_defaults(func=info_command)
 
     # download
     parser_get = subparsers.add_parser("get", help="Download comic")
     parser_get.add_argument("cid", type=int, help="comic id")
-    parser_get.add_argument("-o", "--output", type=str, default="./", help="Output directory")
-    parser_get.add_argument("-f", "--filetype", type=str, default="dir", choices=["dir", "zip", "rar", "cbz", "cbr"], help="Output file type, dir or zip")
-    parser_get.add_argument("-t", "--type", type=str, default="all", help="Type of content to download")
-    parser_get.add_argument("-s", "--skip", type=str, default=None, help="Skip previous content, start from specified chapter")
-    parser_get.add_argument("-p", "--pick", type=str, default=None, help="Pick a specific chapter to download")
-    parser_get.add_argument("-v", "--verbose", action="store_true", help="Verbose output (disable single-line progress)")
+    parser_get.add_argument(
+        "-o", "--output", type=str, default="./", help="Output directory"
+    )
+    parser_get.add_argument(
+        "-f",
+        "--filetype",
+        type=str,
+        default="dir",
+        choices=["dir", "zip", "rar", "cbz", "cbr"],
+        help="Output file type, dir or zip",
+    )
+    parser_get.add_argument(
+        "-t", "--type", type=str, default="all", help="Type of content to download"
+    )
+    parser_get.add_argument(
+        "-s",
+        "--skip",
+        type=str,
+        default=None,
+        help="Skip previous content, start from specified chapter",
+    )
+    parser_get.add_argument(
+        "-p",
+        "--pick",
+        type=str,
+        default=None,
+        help="Pick a specific chapter to download",
+    )
+    parser_get.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        help="Verbose output (disable single-line progress)",
+    )
     parser_get.set_defaults(func=download_command)
 
     args = parser.parse_args()
@@ -33,5 +67,7 @@ def main() -> None:
 
     args.func(args)
 
+
 if __name__ == "__main__":
     main()
+

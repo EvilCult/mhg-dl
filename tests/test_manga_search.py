@@ -1,7 +1,9 @@
 # test_manga_search.py
 import pytest
+
 from mhg_dl.manga_seacher import search_manga
 from mhg_dl.models import MangaInfo
+
 
 def test_search_manga_basic():
     query = "测试漫画"  # 可换成实际存在的关键字
@@ -23,11 +25,14 @@ def test_search_manga_basic():
         assert manga.year is None or isinstance(manga.year, str)
         assert manga.stat is None or isinstance(manga.stat, str)
 
+
 def test_search_manga_no_results():
     # 使用一个不可能的关键字确保返回空列表
-    query = "asdhaskdhakjshdkajshd"  
+    query = "asdhaskdhakjshdkajshd"
     results = search_manga(query)
     assert results == [], "无匹配时应返回空列表"
 
+
 if __name__ == "__main__":
     pytest.main()
+

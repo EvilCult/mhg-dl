@@ -8,8 +8,8 @@ class Logger:
 
     def info(self, msg: str, end: str = "\n"):
         if self._last_was_progress and not self.verbose:
-             print()
-        
+            print()
+
         print(msg, end=end)
         self._last_was_progress = False
 
@@ -18,15 +18,16 @@ class Logger:
             print(msg)
             self._last_was_progress = False
         else:
-            print("\033[K", end="") 
+            print("\033[K", end="")
             print(f"{msg}", end="\r", flush=True)
             self._last_was_progress = True
 
     def error(self, msg: str):
         if self._last_was_progress and not self.verbose:
-             print()
-        
+            print()
+
         print(f"Error: {msg}")
         self._last_was_progress = False
+
 
 log = Logger()

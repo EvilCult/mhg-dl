@@ -1,8 +1,10 @@
 import os
-import zipfile
-import subprocess
 import shutil
+import subprocess
+import zipfile
+
 from mhg_dl.logger import log
+
 
 def pack_zip(download_dir: str, ext: str) -> None:
     for entry in os.scandir(download_dir):
@@ -14,7 +16,9 @@ def pack_zip(download_dir: str, ext: str) -> None:
                 continue
             chapter_dir = chapter_entry.path
             archive_path = chapter_dir + f".{ext}"
-            log.info(f"Packing {chapter_entry.name} -> {os.path.basename(archive_path)}")
+            log.info(
+                f"Packing {chapter_entry.name} -> {os.path.basename(archive_path)}"
+            )
             with zipfile.ZipFile(archive_path, "w", zipfile.ZIP_DEFLATED) as zf:
                 for file in sorted(os.listdir(chapter_dir)):
                     file_path = os.path.join(chapter_dir, file)
@@ -38,11 +42,15 @@ def pack_rar(download_dir: str, ext: str) -> None:
                 continue
             chapter_dir = chapter_entry.path
             archive_path = chapter_dir + f".{ext}"
-            log.info(f"Packing {chapter_entry.name} -> {os.path.basename(archive_path)}")
+            log.info(
+                f"Packing {chapter_entry.name} -> {os.path.basename(archive_path)}"
+            )
             cmd = [rar_bin, "a", "-ep", archive_path, os.path.join(chapter_dir, "*")]
             result = subprocess.run(cmd, capture_output=True, text=True)
             if result.returncode != 0:
-                log.error(f"rar failed for {chapter_entry.name}: {result.stderr.strip()}")
+                log.error(
+                    f"rar failed for {chapter_entry.name}: {result.stderr.strip()}"
+                )
             else:
                 shutil.rmtree(chapter_dir)
 

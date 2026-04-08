@@ -1,14 +1,16 @@
 import os
+import random
 import sys
 import time
-import random
-from mhg_dl.models import MangaInfo
+
 from mhg_dl.config import CHAPTER_URL
-from mhg_dl.manga_fetcher import manga_fetch, filter_chapter, get_chapter_image_urls
-from mhg_dl.manga_downloader import download_chapter, download_image
-from mhg_dl.manga_seacher import search_manga, show_manga_details
 from mhg_dl.logger import log
-from mhg_dl.manga_pack import pack_zip, pack_rar
+from mhg_dl.manga_downloader import download_chapter, download_image
+from mhg_dl.manga_fetcher import filter_chapter, get_chapter_image_urls, manga_fetch
+from mhg_dl.manga_pack import pack_rar, pack_zip
+from mhg_dl.manga_seacher import search_manga, show_manga_details
+from mhg_dl.models import MangaInfo
+
 
 def download_command(args) -> None:
     if log.verbose:
@@ -19,15 +21,15 @@ def download_command(args) -> None:
     if manga.title == "":
         log.error("Comic not found")
         return
-    
+
     manga.chapters = filter_chapter(manga.chapters, args.type, args.skip, args.pick)
 
-    title          = manga.title
-    author         = manga.author
+    title = manga.title
+    author = manga.author
     manga_dir_name = f"{title} - {author}" if author else title
 
-    root_dir       = args.output if args.output != './' else os.getcwd()
-    download_dir   = os.path.join(root_dir, manga_dir_name)
+    root_dir = args.output if args.output != "./" else os.getcwd()
+    download_dir = os.path.join(root_dir, manga_dir_name)
     os.makedirs(download_dir, exist_ok=True)
 
     if manga.cover:
@@ -41,9 +43,9 @@ def download_command(args) -> None:
 
         for chapter_name, chapter_id in chapters.items():
             chapter_url = CHAPTER_URL.format(comic_id=manga.cid, chapter_id=chapter_id)
-            
+
             # Random sleep
-            seconds = random.uniform(0, 2) 
+            seconds = random.uniform(0, 2)
             time.sleep(seconds)
 
             image_urls = get_chapter_image_urls(manga.cid, chapter_url)
@@ -59,6 +61,7 @@ def download_command(args) -> None:
 
     log.info(f"\n(*´Д｀)=3 Done! -->  {manga.title}")
 
+
 def search_command(args) -> None:
     results = search_manga(args.query)
     if not results:
@@ -66,7 +69,10 @@ def search_command(args) -> None:
         return
 
     for manga in results:
-        log.info(f"[{manga.cid}] | {manga.title} ({manga.year}) - {manga.stat} - {manga.author}")
+        log.info(
+            f"[{manga.cid}] | {manga.title} ({manga.year}) - {manga.stat} - {manga.author}"
+        )
+
 
 def info_command(args) -> None:
     manga: MangaInfo = show_manga_details(args.cid)
@@ -85,3 +91,4 @@ def info_command(args) -> None:
         log.info(f"- {chap_type} : [{len(chapters)}]")
         for chap_title in list(reversed(chapters.keys()))[:15]:
             log.info(f"  -- {chap_title}")
+

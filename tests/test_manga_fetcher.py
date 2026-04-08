@@ -2,12 +2,12 @@ import requests
 from bs4 import BeautifulSoup
 
 from mhg_dl.manga_fetcher import (
-    manga_fetch,
     MangaInfo,
+    analyze_chapter,
     fetch_base_info,
     fetch_chapter_list,
-    analyze_chapter,
     make_img_list,
+    manga_fetch,
 )
 
 
@@ -23,7 +23,7 @@ class FakeResponse:
 
 def test_fetch_base_info_and_chapter_list():
     # Build a minimal HTML page matching selectors used in fetcher
-    html = '''
+    html = """
     <html>
       <body>
         <div class="book-title"><h1>测试漫</h1></div>
@@ -43,7 +43,7 @@ def test_fetch_base_info_and_chapter_list():
         </div>
       </body>
     </html>
-    '''
+    """
 
     soup = BeautifulSoup(html, "html.parser")
     # Updated: fetch_base_info now takes cid and returns MangaInfo
@@ -84,7 +84,10 @@ def test_analyze_chapter_uses_unpack(monkeypatch):
 
     # patch unpack to return a dict we control
     # Updated: sl keys changed to e and m
-    monkeypatch.setattr("mhg_dl.manga_fetcher.unpack", lambda s: {"files": ["a.jpg"], "sl": {"e": 1, "m": 2}, "path": "/p/"})
+    monkeypatch.setattr(
+        "mhg_dl.manga_fetcher.unpack",
+        lambda s: {"files": ["a.jpg"], "sl": {"e": 1, "m": 2}, "path": "/p/"},
+    )
 
     result = analyze_chapter("http://example/chapter.html")
     assert isinstance(result, dict)
@@ -104,3 +107,4 @@ def test_make_img_list_builds_urls():
         assert file_name in url
         assert str(chapter_data["sl"]["e"]) in url
         assert str(chapter_data["sl"]["m"]) in url
+

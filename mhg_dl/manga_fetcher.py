@@ -1,52 +1,69 @@
+import time
+from urllib.parse import quote
+
+import lzstring
 import requests
 from bs4 import BeautifulSoup
-from urllib.parse import quote
-import lzstring
-import time
-from mhg_dl.unpacker import unpack
-from mhg_dl.models import MangaInfo
-from mhg_dl.config import FAKE_HEADERS, MANGA_URL, IMAGE_URL
-from mhg_dl.logger import log
 
-def manga_fetch(cid: str,) -> MangaInfo:
+from mhg_dl.config import FAKE_HEADERS, IMAGE_URL, MANGA_URL
+from mhg_dl.logger import log
+from mhg_dl.models import MangaInfo
+from mhg_dl.unpacker import unpack
+
+
+def manga_fetch(
+    cid: str,
+) -> MangaInfo:
     url = MANGA_URL.format(comic_id=cid)
 
     try:
         resp = requests.get(url, headers=FAKE_HEADERS)
         resp.raise_for_status()
-    except Exception :
+    except Exception:
         log.error("The comic id is wrong or the comic does not exist.")
         return MangaInfo(cid=cid, title="")
 
     soup = BeautifulSoup(resp.text, "html.parser")
 
     manga: MangaInfo = fetch_base_info(cid, soup)
-    
+
     chapter_groups = fetch_chapter_list(soup)
     manga.chapters = chapter_groups
 
     return manga
 
+
 def fetch_base_info(cid: str, soup: BeautifulSoup) -> MangaInfo:
     title_elem = soup.select_one(".book-title > h1")
     cover_elem = soup.select_one(".book-cover > p > img")
-    author_elem = soup.select_one(".book-detail > ul.detail-list > li:nth-child(2) > span:nth-child(2) > a")
-    year_elem = soup.select_one(".book-detail > ul.detail-list > li:nth-child(1) > span:nth-child(1) > a")
-    stat_elem = soup.select_one(".book-detail > ul.detail-list > li:nth-child(4) > span")
+    author_elem = soup.select_one(
+        ".book-detail > ul.detail-list > li:nth-child(2) > span:nth-child(2) > a"
+    )
+    year_elem = soup.select_one(
+        ".book-detail > ul.detail-list > li:nth-child(1) > span:nth-child(1) > a"
+    )
+    stat_elem = soup.select_one(
+        ".book-detail > ul.detail-list > li:nth-child(4) > span"
+    )
 
     manga = MangaInfo(
-        cid    = cid,
-        title  = title_elem.text.strip() if title_elem else None,
-        cover  = "https:" + cover_elem["src"] if cover_elem else None,
-        author = author_elem.text.strip() if author_elem else None,
-        year   = year_elem.text.strip() if year_elem else None,
-        stat   = stat_elem.text.strip().split("：")[1] if stat_elem and "：" in stat_elem.text else None,
+        cid=cid,
+        title=title_elem.text.strip() if title_elem else None,
+        cover="https:" + cover_elem["src"] if cover_elem else None,
+        author=author_elem.text.strip() if author_elem else None,
+        year=year_elem.text.strip() if year_elem else None,
+        stat=(
+            stat_elem.text.strip().split("：")[1]
+            if stat_elem and "：" in stat_elem.text
+            else None
+        ),
     )
     return manga
 
+
 def fetch_chapter_list(soup) -> dict[str, dict[str, str]]:
     chapter_groups: dict[str, dict[str, str]] = {}
-    
+
     if soup.find("div", class_="warning-bar") is not None:
         crypto_key = soup.select("input#__VIEWSTATE")[0].get("value")
         decoder = lzstring.LZString()
@@ -70,7 +87,10 @@ def fetch_chapter_list(soup) -> dict[str, dict[str, str]]:
 
     return chapter_groups
 
-def filter_chapter(chapters: dict[str, dict[str, str]], typ: str, skip: str, pick: str) -> dict[str, dict[str, str]]:
+
+def filter_chapter(
+    chapters: dict[str, dict[str, str]], typ: str, skip: str, pick: str
+) -> dict[str, dict[str, str]]:
     if typ == "all":
         return chapters
 
@@ -88,12 +108,14 @@ def filter_chapter(chapters: dict[str, dict[str, str]], typ: str, skip: str, pic
         tmp: dict[str, str] = {pick: dl_chapters[pick]} if pick in dl_chapters else {}
         dl_chapters = tmp
 
-    return  {typ: dl_chapters}
+    return {typ: dl_chapters}
+
 
 def get_chapter_image_urls(cid: str, chapter_url: str) -> list[str]:
     log.progress(f"Analyzing: {chapter_url}")
     images_data = analyze_chapter(chapter_url)
     return make_img_list(images_data)
+
 
 def analyze_chapter(chapter_url: str) -> dict[str, any]:
     chapter_data: dict[str, any] = {}
@@ -108,7 +130,9 @@ def analyze_chapter(chapter_url: str) -> dict[str, any]:
                 log.info(f"Attempt {attempt} failed for {chapter_url}")
                 time.sleep(5)
             else:
-                log.error(f"Failed to access chapter after {max_retries} attempts: {chapter_url}")
+                log.error(
+                    f"Failed to access chapter after {max_retries} attempts: {chapter_url}"
+                )
                 return chapter_data
 
     soup = BeautifulSoup(resp.text, "html.parser")
@@ -119,14 +143,20 @@ def analyze_chapter(chapter_url: str) -> dict[str, any]:
             chapter_data = unpack(script_text)
     return chapter_data
 
+
 def make_img_list(chapter_data: dict[str, any]) -> list[str]:
     dl_list: list[str] = []
     if "sl" not in chapter_data or "files" not in chapter_data:
         return dl_list
-    
+
     for file_name in chapter_data["files"]:
         path: str = chapter_data["path"]
-        image_url = IMAGE_URL.format(path=quote(path), file_name=file_name, e0=chapter_data["sl"]["e"], e1=chapter_data["sl"]["m"])
+        image_url = IMAGE_URL.format(
+            path=quote(path),
+            file_name=file_name,
+            e0=chapter_data["sl"]["e"],
+            e1=chapter_data["sl"]["m"],
+        )
         dl_list.append(image_url)
 
     return dl_list
