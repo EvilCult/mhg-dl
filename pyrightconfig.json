@@ -1,4 +1,9 @@
 {
+    "include": ["."],
+    "exclude": ["**/node_modules", "**/__pycache__", ".venv"],
     "venvPath": ".",
-    "venv": ".venv"
+    "venv": ".venv",
+    "analysis": {
+        "extraPaths": ["."]
+    }
 }
